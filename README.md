@@ -8,7 +8,7 @@ by [@ben_makes_stuff](https://x.com/ben_makes_stuff)
 
 - **Git**: Ensure you have Git installed and initialized in your project.
 - **Go**: This utility is written in Go. Ensure you have Go installed.
-- **OpenAI API Key**: If you want to use OpenAI for generating commit messages, set up an API key by creating a `.env` file in the root of your project and adding your key like this:
+- **OpenAI API Key**: If you want to use OpenAI for generating commit messages, make sure you set your environment variable like this:
   ```
   OPENAI_API_KEY=your-openai-api-key
   ```
