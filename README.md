@@ -1,4 +1,4 @@
-# Push🫸
+# Push 🚀
 
 This utility automates the process of committing and pushing code changes to your Git repository. It generates a commit message based on the changes using OpenAI's GPT model or falls back to a default message if no API key is provided.
 
@@ -14,7 +14,7 @@ This utility automates the process of committing and pushing code changes to you
 ## Quick Start
 
 1. Download the binary for your platform here: https://github.com/bakatz/push/releases
-1. Then add it as an alias (replace darwin-arm64 with your computer's os and cpu architecture): `alias push=path/to/download/dir/push-darwin-arm64`
+1. Then add it as an alias (replace darwin-arm64 with your computer's os and cpu architecture, and if desired replace `push` with something else like `ship`): `alias push=path/to/download/dir/push-darwin-arm64`
 1. You're done! Just run `push` to start using it.
 
 ## Build
