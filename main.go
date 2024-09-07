@@ -24,28 +24,23 @@ func main() {
 		return
 	}
 
-	changes := getUnpushedChanges()
-	if changes == "" {
-		fmt.Println("No uncommitted changes found.")
-		return
+	if changes := getUnpushedChanges(); changes != "" {
+		commitMessage := generateCommitMessage(changes)
+		fmt.Printf("Generated commit message:\n%s\n", commitMessage)
+
+		if err := commitChanges(commitMessage); err != nil {
+			fmt.Println("Error committing changes:", err)
+			return
+		}
+		fmt.Println("Changes committed successfully.")
 	}
 
-	commitMessage := generateCommitMessage(changes)
-	fmt.Printf("Generated commit message:\n%s\n", commitMessage)
-
-	err := commitChanges(commitMessage)
-	if err != nil {
-		fmt.Println("Error committing changes:", err)
-		return
-	}
-
-	err = pushChanges()
-	if err != nil {
+	if err := pushChanges(); err != nil {
 		fmt.Println("Error pushing changes:", err)
 		return
 	}
 
-	fmt.Println("Changes committed and pushed successfully.")
+	fmt.Println("Changes pushed successfully.")
 }
 
 func addAllChanges() error {
