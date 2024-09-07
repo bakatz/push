@@ -11,32 +11,28 @@ This utility automates the process of committing and pushing code changes to you
   OPENAI_API_KEY=your-openai-api-key
   ```
 
-## Installation
+## Quick Start
 
-Clone the repository and navigate to the project directory:
-
-```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
-```
+1. Download the binary for your platform here: https://github.com/bakatz/push/releases
+1. Then add it as an alias (replace darwin-arm64 with your computer's os and cpu architecture): `alias push=path/to/download/dir/push-darwin-arm64`
+1. You're done! Just run `push` to start using it.
 
 ## Build
 
-To build the utility, simply run the following command:
+To build the utility, you need Golang installed (latest version from https://go.dev). Then simply run the following command:
 
 ```bash
 make
 ```
 
-This will compile the Go code and generate an executable.
+This will compile the Go code and generate a bunch of cross-platform executables in the `build` directory.
+
+Example binary path:
+```bash
+./build/push-darwin-arm64
+```
 
 ## Usage
-
-To run the utility, execute the following command:
-
-```bash
-./your-executable
-```
 
 The utility will perform the following steps:
 1. Add all changes using `git add .`.
@@ -75,4 +71,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ---
 
-Feel free to customize and extend this utility as per your needs!
+Feel free to customize and extend this utility!
