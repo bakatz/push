@@ -103,7 +103,7 @@ func getChangeDescription(changes, apiKey string) string {
 	)
 
 	if err != nil {
-		fmt.Printf("ChatCompletion error: %v\n", err)
+		fmt.Printf("ChatCompletion error: %v, using default message for this commit\n", err)
 		return defaultMessage
 	}
 
@@ -123,7 +123,7 @@ func formatCommitMessage(description string) string {
 }
 
 func commitChanges(message string) error {
-	cmd := exec.Command("git", "commit", "-am", message)
+	cmd := exec.Command("git", "commit", "-m", message)
 	fmt.Printf("Running command: %s\n", cmd.String())
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -135,13 +135,13 @@ func commitChanges(message string) error {
 }
 
 func pushChanges() error {
-	// cmd := exec.Command("git", "push")
-	// fmt.Printf("Running command: %s\n", cmd.String())
-	// output, err := cmd.CombinedOutput()
-	// if err != nil {
-	// 	fmt.Printf("Command output:\n%s\n", string(output))
-	// 	return err
-	// }
-	// fmt.Printf("Push successful. Output:\n%s\n", string(output))
+	cmd := exec.Command("git", "push")
+	fmt.Printf("Running command: %s\n", cmd.String())
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Printf("Command output:\n%s\n", string(output))
+		return err
+	}
+	fmt.Printf("Push successful. Output:\n%s\n", string(output))
 	return nil
 }
