@@ -1,6 +1,6 @@
 # Push 🚀
 
-This utility automates the process of committing and pushing code changes to your Git repository. It generates a commit message based on the changes using OpenAI's GPT model or falls back to a default message if no API key is provided.
+This utility automates the process of committing and pushing code changes to your Git repository. It generates a commit message based on the changes using OpenAI's GPT model or falls back to "🚀" if no API key is provided.
 
 by [@ben_makes_stuff](https://x.com/ben_makes_stuff)
 
