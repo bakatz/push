@@ -15,13 +15,14 @@ by [@ben_makes_stuff](https://x.com/ben_makes_stuff)
 1. Then add it as an alias (replace darwin-arm64 with your computer's os and cpu architecture, and if desired replace `push` with something else like `ship`): `alias push=path/to/download/dir/push-darwin-arm64`
 1. You're done! Just run `push` to start using it.
 
-## Dev Requirements
-
-- **Go**: This utility is written in Go. Ensure you have Go installed.
-- **OpenAI API Key**: If you want to use OpenAI for generating commit messages, make sure you set your environment variable like this:
+Optionally: if you want to use OpenAI for generating commit messages, make sure you set your environment variable like this before running the above steps:
   ```
   OPENAI_API_KEY=your-openai-api-key
   ```
+
+## Dev Requirements
+
+- **Go**: This utility is written in Go. Ensure you have Go installed.
 
 ## Build
 
