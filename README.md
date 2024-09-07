@@ -23,33 +23,6 @@ Optionally: if you want to use OpenAI for generating commit messages, make sure 
   OPENAI_API_KEY=your-openai-api-key
   ```
 
-## Dev Requirements
-
-- **Go**: This utility is written in Go. Ensure you have Go installed.
-
-## Build
-
-To build the utility, you need Golang installed (latest version from https://go.dev). Then simply run the following command:
-
-```bash
-make
-```
-
-This will compile the Go code and generate a bunch of cross-platform executables in the `build` directory.
-
-Example binary path:
-```bash
-./build/push-darwin-arm64
-```
-
-## Usage
-
-The utility will perform the following steps:
-1. Add all changes using `git add .`.
-2. Generate a commit message based on the changes using OpenAI's GPT model (if available) or use the default message `🚀`.
-3. Commit the changes with the generated message.
-4. Push the changes to the remote repository.
-
 ## Example Output
 
 ```bash
@@ -68,6 +41,33 @@ Push successful. Output:
 To https://github.com/your-username/your-repo.git
    1f4e9d4..a1b2c3d  main -> main
 Changes committed and pushed successfully.
+```
+
+## Overview
+
+The utility will perform the following steps:
+1. Add all changes using `git add .`.
+2. Generate a commit message based on the changes using OpenAI's GPT model (if available) or use the default message `🚀`.
+3. Commit the changes with the generated message.
+4. Push the changes to the remote repository.
+
+## Build Requirements
+
+- **Go**: This utility is written in Go. Ensure you have Go installed.
+
+## How to Build
+
+To build the utility, you need Golang installed (latest version from https://go.dev). Then simply run the following command:
+
+```bash
+make
+```
+
+This will compile the Go code and generate a bunch of cross-platform executables in the `build` directory.
+
+Example binary path:
+```bash
+./build/push-darwin-arm64
 ```
 
 ## Troubleshooting
