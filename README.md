@@ -14,12 +14,12 @@ Longer explanation: this utility automates the process of committing and pushing
 ## Quick Start
 
 1. Download the binary for your platform here: https://github.com/bakatz/push/releases
-1. Then add it as an alias (replace darwin-arm64 with your computer's os and cpu architecture, and if desired replace `push` with something else like `ship`): `alias push=path/to/download/dir/push-darwin-arm64`
+1. Then add it as an alias (replace darwin-arm64 with your computer's os and cpu architecture, and if desired replace `push` with something else like `ship`): `alias push="/path/to/download/dir/push-darwin-arm64"`
 1. You're done! Just run `push` to start using it.
 
 Optionally: if you want to use OpenAI for generating commit messages, make sure you set your environment variable like this before running the above steps:
   ```
-  OPENAI_API_KEY=your-openai-api-key
+  export OPENAI_API_KEY=your-openai-api-key
   ```
 
 ## Example Output
