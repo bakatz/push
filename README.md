@@ -2,12 +2,11 @@
 
 Never write a commit message again.
 
-Longer explanation: this utility automates the process of committing and pushing code changes to your Git repository. It generates a commit message based on the changes using OpenAI's `gpt-4o-mini` model or falls back to "🚀" if no API key is provided.
-
 by [@ben_makes_stuff](https://x.com/ben_makes_stuff)
 
 [![Buy me a coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=☕&slug=ben_makes_stuff&button_colour=FFDD00&font_colour=000000&font_family=Lato&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/ben_makes_stuff)
 
+Longer explanation: this utility automates the process of committing and pushing code changes to your Git repository. It generates a commit message based on the changes using OpenAI's `gpt-4o-mini` model or falls back to "🚀" if no API key is provided.
 
 ## Requirements
 - **Git**: Ensure you have Git installed and initialized in your project.
