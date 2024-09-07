@@ -2,7 +2,7 @@
 
 Never manually write a commit message again.
 
-Longer explanation: this utility automates the process of committing and pushing code changes to your Git repository. It generates a commit message based on the changes using OpenAI's GPT model or falls back to "🚀" if no API key is provided.
+Longer explanation: this utility automates the process of committing and pushing code changes to your Git repository. It generates a commit message based on the changes using OpenAI's `gpt-4o-mini` model or falls back to "🚀" if no API key is provided.
 
 by [@ben_makes_stuff](https://x.com/ben_makes_stuff)
 
