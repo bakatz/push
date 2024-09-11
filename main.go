@@ -87,7 +87,7 @@ func generateCommitMessage(changes string) string {
 
 func getChangeDescription(changes, apiKey string) string {
 	client := openai.NewClient(apiKey)
-	prompt := fmt.Sprintf("Analyze the following git diff and provide a concise description of the changes (72 characters or less):\n\n%s", changes)
+	prompt := fmt.Sprintf("Analyze the following git diff and provide a concise description of the changes (%d characters or less):\n\n%s", maxCommitLength, changes)
 
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
