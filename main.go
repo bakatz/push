@@ -139,8 +139,12 @@ func commitChanges(message string, isInteractive bool) error {
 	fmt.Printf("Commit successful. Output:\n%s\n", string(output))
 
 	if isInteractive {
-		fmt.Printf("Running command: %s\n", cmd.String())
 		cmd := exec.Command("git", "commit", "--amend")
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		
+		fmt.Printf("Running command: %s\n", cmd.String())
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			fmt.Printf("Command output:\n%s\n", string(output))
