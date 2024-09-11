@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"flag"
 
 	"github.com/joho/godotenv"
 	"github.com/sashabaranov/go-openai"
@@ -19,6 +20,11 @@ const (
 func main() {
 	_ = godotenv.Load() // Ignore error if .env file doesn't exist
 
+	isInteractive := false
+	if isInteractivePtr := flag.Bool("i", false, "interactive mode (edit commit message before pushing)"); isInteractivePtr != nil {
+		isInteractive = *isInteractivePtr
+	}
+
 	if err := addAllChanges(); err != nil {
 		fmt.Println("Could not add all changes due to an error:", err)
 		return
@@ -28,7 +34,7 @@ func main() {
 		commitMessage := generateCommitMessage(changes)
 		fmt.Printf("Generated commit message:\n%s\n", commitMessage)
 
-		if err := commitChanges(commitMessage); err != nil {
+		if err := commitChanges(commitMessage, isInteractive); err != nil {
 			fmt.Println("Error committing changes:", err)
 			return
 		}
@@ -117,7 +123,7 @@ func formatCommitMessage(description string) string {
 	return description
 }
 
-func commitChanges(message string) error {
+func commitChanges(message string, isInteractive bool) error {
 	cmd := exec.Command("git", "commit", "-m", message)
 	fmt.Printf("Running command: %s\n", cmd.String())
 	output, err := cmd.CombinedOutput()
@@ -126,6 +132,19 @@ func commitChanges(message string) error {
 		return err
 	}
 	fmt.Printf("Commit successful. Output:\n%s\n", string(output))
+
+	if isInteractive {
+		fmt.Printf("Running command: %s\n", cmd.String())
+		cmd := exec.Command("git", "commit", "--amend")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			fmt.Printf("Command output:\n%s\n", string(output))
+			return err
+		}
+
+		fmt.Printf("Commit amend successful. Output:\n%s\n", string(output))
+	}
+	
 	return nil
 }
 
