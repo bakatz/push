@@ -21,7 +21,10 @@ func main() {
 	_ = godotenv.Load() // Ignore error if .env file doesn't exist
 
 	isInteractive := false
-	if isInteractivePtr := flag.Bool("i", false, "interactive mode (edit commit message before pushing)"); isInteractivePtr != nil {
+	isInteractivePtr := flag.Bool("i", false, "interactive mode (edit commit message before pushing)")
+	flag.Parse()
+
+	if isInteractivePtr != nil {
 		isInteractive = *isInteractivePtr
 	}
 
