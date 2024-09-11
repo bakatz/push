@@ -28,8 +28,6 @@ func main() {
 		isInteractive = *isInteractivePtr
 	}
 
-	println("isinteractive:", isInteractive)
-
 	if err := addAllChanges(); err != nil {
 		fmt.Println("Could not add all changes due to an error:", err)
 		return
