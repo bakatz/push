@@ -143,7 +143,7 @@ func commitChanges(message string, isInteractive bool) error {
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
-		
+
 		fmt.Printf("Running command: %s\n", cmd.String())
 		output, err := cmd.CombinedOutput()
 		if err != nil {
