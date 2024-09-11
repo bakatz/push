@@ -149,7 +149,7 @@ func commitChanges(message string, isInteractive bool) error {
 			return err
 		}
 
-		fmt.Printf("Commit amend successful.")
+		fmt.Println("Commit amend successful.")
 	}
 
 	return nil
