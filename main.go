@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
-	"flag"
 
 	"github.com/joho/godotenv"
 	"github.com/sashabaranov/go-openai"
@@ -145,15 +145,13 @@ func commitChanges(message string, isInteractive bool) error {
 		cmd.Stderr = os.Stderr
 
 		fmt.Printf("Running command: %s\n", cmd.String())
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			fmt.Printf("Command output:\n%s\n", string(output))
+		if err := cmd.Run(); err != nil {
 			return err
 		}
 
-		fmt.Printf("Commit amend successful. Output:\n%s\n", string(output))
+		fmt.Printf("Commit amend successful.")
 	}
-	
+
 	return nil
 }
 
