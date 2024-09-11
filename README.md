@@ -56,9 +56,10 @@ Changes committed and pushed successfully.
 
 The utility will perform the following steps:
 1. Add all changes using `git add .`.
-2. Generate a commit message based on the changes using OpenAI's GPT model (if available) or use the default message `🚀`.
-3. Commit the changes with the generated message.
-4. Push the changes to the remote repository.
+1. Generate a commit message based on the changes using OpenAI's GPT model (if available) or use the default message `🚀`.
+1. Commit the changes with the generated message.
+1. If you passed `-i`, allow you to edit the commit message that was just generated.
+1. Push the changes to the remote repository.
 
 ## Build Requirements
 
