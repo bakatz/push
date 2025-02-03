@@ -126,9 +126,10 @@ func getChangeDescription(changes, apiKey string) string {
 
 	if len(resp.Choices) > 0 {
 		return resp.Choices[0].Message.Content
+	} else {
+		fmt.Println("ChatCompletion response has no choices, using default message for this commit")
+		return defaultMessage
 	}
-
-	return defaultMessage
 }
 
 func formatCommitMessage(description string) string {
