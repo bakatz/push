@@ -21,11 +21,18 @@ func main() {
 	_ = godotenv.Load() // Ignore error if .env file doesn't exist
 
 	isInteractivePtr := flag.Bool("i", false, "interactive mode (edit commit message before pushing)")
+	isDryRunPtr := flag.Bool("d", false, "dry-run mode (don't actually commit or push, just show what would have happened)")
+
 	flag.Parse()
 
 	isInteractive := false
 	if isInteractivePtr != nil {
 		isInteractive = *isInteractivePtr
+	}
+
+	isDryRun := false
+	if isDryRunPtr != nil {
+		isDryRun = *isDryRunPtr
 	}
 
 	if err := addAllChanges(); err != nil {
@@ -37,14 +44,14 @@ func main() {
 		commitMessage := generateCommitMessage(changes)
 		fmt.Printf("Generated commit message:\n%s\n", commitMessage)
 
-		if err := commitChanges(commitMessage, isInteractive); err != nil {
+		if err := commitChanges(commitMessage, isInteractive, isDryRun); err != nil {
 			fmt.Println("Error committing changes:", err)
 			return
 		}
 		fmt.Println("Changes committed successfully.")
 	}
 
-	if err := pushChanges(); err != nil {
+	if err := pushChanges(isDryRun); err != nil {
 		fmt.Println("Error pushing changes:", err)
 		return
 	}
@@ -86,7 +93,13 @@ func generateCommitMessage(changes string) string {
 }
 
 func getChangeDescription(changes, apiKey string) string {
-	client := openai.NewClient(apiKey)
+	openaiConfig := openai.DefaultConfig(apiKey)
+	if openaiBaseURL := os.Getenv("OPENAI_BASE_URL"); openaiBaseURL != "" {
+		openaiConfig.BaseURL = openaiBaseURL
+		fmt.Printf("Custom OPENAI_BASE_URL detected. Using %s as the API Base URL.\n", openaiConfig.BaseURL)
+	}
+
+	client := openai.NewClientWithConfig(openaiConfig)
 	prompt := fmt.Sprintf("Analyze the following git diff and provide a concise description of the changes (%d characters or less):\n\n%s", maxCommitLength, changes)
 
 	resp, err := client.CreateChatCompletion(
@@ -126,7 +139,7 @@ func formatCommitMessage(description string) string {
 	return description
 }
 
-func commitChanges(message string, isInteractive bool) error {
+func commitChanges(message string, isInteractive, isDryRun bool) error {
 	cmd := exec.Command("git", "commit", "-m", message)
 	fmt.Printf("Running command: %s\n", cmd.String())
 	output, err := cmd.CombinedOutput()
@@ -142,25 +155,35 @@ func commitChanges(message string, isInteractive bool) error {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 
-		fmt.Printf("Running command: %s\n", cmd.String())
-		if err := cmd.Run(); err != nil {
-			return err
-		}
+		if isDryRun {
+			fmt.Printf("Dry-run mode enabled. Skipping command: %s\n", cmd.String())
+		} else {
+			fmt.Printf("Running command: %s\n", cmd.String())
+			if err := cmd.Run(); err != nil {
+				return err
+			}
 
-		fmt.Println("Commit amend successful.")
+			fmt.Println("Commit amend successful.")
+		}
 	}
 
 	return nil
 }
 
-func pushChanges() error {
+func pushChanges(isDryRun bool) error {
 	cmd := exec.Command("git", "push")
-	fmt.Printf("Running command: %s\n", cmd.String())
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		fmt.Printf("Command output:\n%s\n", string(output))
-		return err
+
+	if isDryRun {
+		fmt.Printf("Dry-run mode enabled. Skipping command: %s\n", cmd.String())
+		return nil
+	} else {
+		fmt.Printf("Running command: %s\n", cmd.String())
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			fmt.Printf("Command output:\n%s\n", string(output))
+			return err
+		}
+		fmt.Printf("Push successful. Output:\n%s\n", string(output))
+		return nil
 	}
-	fmt.Printf("Push successful. Output:\n%s\n", string(output))
-	return nil
 }
