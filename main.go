@@ -60,14 +60,8 @@ func main() {
 }
 
 func addAllChanges() error {
-	cmd := exec.Command("git", "add", ".")
-	fmt.Printf("Running command: %s\n", cmd.String())
-	_, err := cmd.Output()
-	if err != nil {
-		fmt.Println("Error adding all changes:", err)
-		return err
-	}
-	return nil
+	_, err := runCommandOrDryRun(exec.Command("git", "add", "."), false)
+	return err
 }
 
 func getUnpushedChanges() string {
@@ -134,6 +128,7 @@ func getChangeDescription(changes, apiKey string) string {
 
 func formatCommitMessage(description string) string {
 	description = strings.TrimSpace(description)
+
 	if len(description) > maxCommitLength {
 		description = description[:maxCommitLength-3] + "..."
 	}
@@ -141,14 +136,9 @@ func formatCommitMessage(description string) string {
 }
 
 func commitChanges(message string, isInteractive, isDryRun bool) error {
-	cmd := exec.Command("git", "commit", "-m", message)
-	fmt.Printf("Running command: %s\n", cmd.String())
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		fmt.Printf("Command output:\n%s\n", string(output))
+	if _, err := runCommandOrDryRun(exec.Command("git", "commit", "-m", message), isDryRun); err != nil {
 		return err
 	}
-	fmt.Printf("Commit successful. Output:\n%s\n", string(output))
 
 	if isInteractive {
 		cmd := exec.Command("git", "commit", "--amend")
@@ -156,15 +146,8 @@ func commitChanges(message string, isInteractive, isDryRun bool) error {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 
-		if isDryRun {
-			fmt.Printf("Dry-run mode enabled. Skipping command: %s\n", cmd.String())
-		} else {
-			fmt.Printf("Running command: %s\n", cmd.String())
-			if err := cmd.Run(); err != nil {
-				return err
-			}
-
-			fmt.Println("Commit amend successful.")
+		if err := runCommandOrDryRunNoOutput(cmd, isDryRun); err != nil {
+			return err
 		}
 	}
 
@@ -172,19 +155,36 @@ func commitChanges(message string, isInteractive, isDryRun bool) error {
 }
 
 func pushChanges(isDryRun bool) error {
-	cmd := exec.Command("git", "push")
+	_, err := runCommandOrDryRun(exec.Command("git", "push"), isDryRun)
+	return err
+}
 
+func runCommandOrDryRun(cmd *exec.Cmd, isDryRun bool) (string, error) {
 	if isDryRun {
 		fmt.Printf("Dry-run mode enabled. Skipping command: %s\n", cmd.String())
-		return nil
+		return "", nil
 	} else {
 		fmt.Printf("Running command: %s\n", cmd.String())
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			fmt.Printf("Command output:\n%s\n", string(output))
+			return string(output), err
+		}
+		fmt.Printf("Command successful. Output:\n%s\n", string(output))
+		return string(output), nil
+	}
+}
+
+func runCommandOrDryRunNoOutput(cmd *exec.Cmd, isDryRun bool) error {
+	if isDryRun {
+		fmt.Printf("Dry-run mode enabled. Skipping command: %s\n", cmd.String())
+		return nil
+	} else {
+		fmt.Printf("Running command: %s\n", cmd.String())
+		if err := cmd.Run(); err != nil {
 			return err
 		}
-		fmt.Printf("Push successful. Output:\n%s\n", string(output))
+		fmt.Println("Command successful.")
 		return nil
 	}
 }
