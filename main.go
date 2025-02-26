@@ -76,9 +76,9 @@ func getUnpushedChanges() string {
 }
 
 func generateCommitMessage(changes string) string {
-	apiKey := os.Getenv("OPENAI_API_KEY")
+	apiKey := os.Getenv("PUSH_OPENAI_API_KEY")
 	if apiKey == "" {
-		fmt.Println("OPENAI_API_KEY not set. Using default commit message.")
+		fmt.Println("PUSH_OPENAI_API_KEY not set. Using default commit message.")
 		return defaultMessage
 	}
 
@@ -88,9 +88,15 @@ func generateCommitMessage(changes string) string {
 
 func getChangeDescription(changes, apiKey string) string {
 	openaiConfig := openai.DefaultConfig(apiKey)
-	if openaiBaseURL := os.Getenv("OPENAI_BASE_URL"); openaiBaseURL != "" {
+	if openaiBaseURL := os.Getenv("PUSH_OPENAI_BASE_URL"); openaiBaseURL != "" {
 		openaiConfig.BaseURL = openaiBaseURL
-		fmt.Printf("Custom OPENAI_BASE_URL detected. Using %s as the API Base URL.\n", openaiConfig.BaseURL)
+		fmt.Printf("Custom OpenAI base URL detected. Using %s as the API Base URL.\n", openaiConfig.BaseURL)
+	}
+
+	model := openai.GPT4oMini
+	if customModel := os.Getenv("PUSH_OPENAI_MODEL"); customModel != "" {
+		model = customModel
+		fmt.Printf("Custom OpenAI model detected. Using %s as the model.\n", model)
 	}
 
 	client := openai.NewClientWithConfig(openaiConfig)
@@ -99,7 +105,7 @@ func getChangeDescription(changes, apiKey string) string {
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model: openai.GPT4oMini,
+			Model: model,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleSystem,
