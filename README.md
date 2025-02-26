@@ -17,14 +17,16 @@ Longer explanation: this utility automates the process of committing and pushing
 1. Then add it as an alias (replace darwin-arm64 with your computer's os and cpu architecture, and if desired replace `push` with something else like `ship`): `alias push="/path/to/download/dir/push-darwin-arm64"`
 1. You're done! Just run `push` to start using it.
 
-Optionally: if you want to use OpenAI for generating commit messages, make sure you set your environment variable like this before running the above steps:
+Optionally: if you want to use OpenAI for generating commit messages, make sure you set this environment variable before running the above steps:
   ```
-  export PUSH_OPENAI_API_KEY=your-openai-api-key
+  export PUSH_OPENAI_API_KEY="your-openai-api-key"
   ```
 
-Optionally: if you want to run a local LLM that is compatible with the OpenAI API instead of OpenAI, make sure you set your environment variable like this before running the above steps:
+Optionally: if you want to run a local LLM that is compatible with the OpenAI API instead of OpenAI, make sure you set these three environment variables before running the above steps:
   ```
+  export PUSH_OPENAI_API_KEY="dummy"
   export PUSH_OPENAI_BASE_URL="http://localhost:1234/v1"
+  export PUSH_OPENAI_MODEL="deepseek-r1-distill-qwen-14b@q4_k_m"
   ```
 You can use [LM Studio](https://lmstudio.ai/)'s API server found in the Development tab of the LM Studio app with the above approach. Note that you can set `PUSH_OPENAI_API_KEY` to any value when using this approach as the auth token is completely ignored by LM Studio. Using a value like "dummy" is fine.
 
