@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -10,12 +11,17 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/sashabaranov/go-openai"
+	"github.com/sashabaranov/go-openai/jsonschema"
 )
 
 const (
 	maxCommitLength = 72
 	defaultMessage  = "🚀"
 )
+
+type CommitMessageResponse struct {
+	CommitMessage string `json:"commit_message" required:"true"`
+}
 
 func main() {
 	_ = godotenv.Load() // Ignore error if .env file doesn't exist
@@ -102,6 +108,13 @@ func getChangeDescription(changes, apiKey string) string {
 	client := openai.NewClientWithConfig(openaiConfig)
 	prompt := fmt.Sprintf("Analyze the following git diff and provide a concise description of the changes (%d characters or less):\n\n%s", maxCommitLength, changes)
 
+	var schemaToUse CommitMessageResponse
+	schema, err := jsonschema.GenerateSchemaForType(schemaToUse)
+	if err != nil {
+		fmt.Printf("Failed to generate schema for type, exiting: %v\n", err)
+		os.Exit(-1)
+	}
+
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
@@ -116,6 +129,14 @@ func getChangeDescription(changes, apiKey string) string {
 					Content: prompt,
 				},
 			},
+			ResponseFormat: &openai.ChatCompletionResponseFormat{
+				Type: openai.ChatCompletionResponseFormatTypeJSONSchema,
+				JSONSchema: &openai.ChatCompletionResponseFormatJSONSchema{
+					Name:   "commit_message_schema",
+					Schema: schema,
+					Strict: true,
+				},
+			},
 		},
 	)
 
@@ -125,9 +146,15 @@ func getChangeDescription(changes, apiKey string) string {
 	}
 
 	if len(resp.Choices) > 0 {
-		return resp.Choices[0].Message.Content
+		respObj := &CommitMessageResponse{}
+		if err := json.Unmarshal([]byte(resp.Choices[0].Message.Content), respObj); err != nil || respObj.CommitMessage == "" {
+			fmt.Println("ChatCompletion response could not be parsed as JSON or the generated message was empty, using default message for this commit")
+			return defaultMessage
+		}
+
+		return respObj.CommitMessage
 	} else {
-		fmt.Println("ChatCompletion response has no choices, using default message for this commit")
+		fmt.Println("ChatCompletion response was in an unexpected format, using default message for this commit")
 		return defaultMessage
 	}
 }
