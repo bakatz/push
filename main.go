@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/sashabaranov/go-openai"
@@ -88,8 +87,7 @@ func generateCommitMessage(changes string) string {
 		return defaultMessage
 	}
 
-	description := getChangeDescription(changes, apiKey)
-	return formatCommitMessage(description)
+	return getChangeDescription(changes, apiKey)
 }
 
 func getChangeDescription(changes, apiKey string) string {
@@ -157,15 +155,6 @@ func getChangeDescription(changes, apiKey string) string {
 		fmt.Println("ChatCompletion response was in an unexpected format, using default message for this commit")
 		return defaultMessage
 	}
-}
-
-func formatCommitMessage(description string) string {
-	description = strings.TrimSpace(description)
-
-	if len(description) > maxCommitLength {
-		description = description[:maxCommitLength-3] + "..."
-	}
-	return description
 }
 
 func commitChanges(message string, isInteractive, isDryRun bool) error {
