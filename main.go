@@ -47,7 +47,7 @@ func main() {
 
 	if changes := getUnpushedChanges(); changes != "" {
 		commitMessage := generateCommitMessage(changes)
-		fmt.Printf("Generated commit message:\n\n%s\n", commitMessage)
+		fmt.Printf("Generated commit message:\n\n%s\n\n", commitMessage)
 
 		if err := commitChanges(commitMessage, isInteractive, isDryRun); err != nil {
 			fmt.Println("Error committing changes:", err)
