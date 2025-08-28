@@ -15,4 +15,8 @@ clean:
 	rm -rf $(OUTPUT_DIR)
 	@echo "Cleaned up the build directory"
 
+update:
+	go get -u ./...
+	go mod tidy
+
 .PHONY: $(PLATFORMS) all clean
