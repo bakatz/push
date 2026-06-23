@@ -8,9 +8,10 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/invopop/jsonschema"
 	"github.com/joho/godotenv"
-	"github.com/sashabaranov/go-openai"
-	"github.com/sashabaranov/go-openai/jsonschema"
+	openai "github.com/openai/openai-go/v3"
+	"github.com/openai/openai-go/v3/option"
 )
 
 const (
@@ -19,8 +20,20 @@ const (
 )
 
 type CommitMessageResponse struct {
-	CommitMessage string `json:"commit_message" required:"true"`
+	CommitMessage string `json:"commit_message" jsonschema_description:"The commit message to use"`
 }
+
+func generateSchema[T any]() interface{} {
+	reflector := jsonschema.Reflector{
+		AllowAdditionalProperties: false,
+		DoNotReference:            true,
+	}
+	var v T
+	schema := reflector.Reflect(v)
+	return schema
+}
+
+var commitMessageResponseSchema = generateSchema[CommitMessageResponse]()
 
 func main() {
 	_ = godotenv.Load() // Ignore error if .env file doesn't exist
@@ -91,48 +104,39 @@ func generateCommitMessage(changes string) string {
 }
 
 func getChangeDescription(changes, apiKey string) string {
-	openaiConfig := openai.DefaultConfig(apiKey)
-	if openaiBaseURL := os.Getenv("PUSH_OPENAI_BASE_URL"); openaiBaseURL != "" {
-		openaiConfig.BaseURL = openaiBaseURL
-		fmt.Printf("Custom OpenAI base URL detected. Using %s as the API Base URL.\n", openaiConfig.BaseURL)
+	opts := []option.RequestOption{
+		option.WithAPIKey(apiKey),
 	}
 
-	model := openai.GPT4oMini
+	if openaiBaseURL := os.Getenv("PUSH_OPENAI_BASE_URL"); openaiBaseURL != "" {
+		opts = append(opts, option.WithBaseURL(openaiBaseURL))
+		fmt.Printf("Custom OpenAI base URL detected. Using %s as the API Base URL.\n", openaiBaseURL)
+	}
+
+	model := openai.ChatModelGPT5_4Mini
 	if customModel := os.Getenv("PUSH_OPENAI_MODEL"); customModel != "" {
-		model = customModel
+		model = openai.ChatModel(customModel)
 		fmt.Printf("Custom OpenAI model detected. Using %s as the model.\n", model)
 	}
 
-	client := openai.NewClientWithConfig(openaiConfig)
+	client := openai.NewClient(opts...)
 	prompt := fmt.Sprintf("Analyze the following git diff and provide a concise description of the changes (%d characters or less):\n\n%s", maxCommitLength, changes)
 
-	var schemaToUse CommitMessageResponse
-	schema, err := jsonschema.GenerateSchemaForType(schemaToUse)
-	if err != nil {
-		fmt.Printf("Failed to generate schema for type, exiting: %v\n", err)
-		os.Exit(-1)
-	}
-
-	resp, err := client.CreateChatCompletion(
+	resp, err := client.Chat.Completions.New(
 		context.Background(),
-		openai.ChatCompletionRequest{
+		openai.ChatCompletionNewParams{
 			Model: model,
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role:    openai.ChatMessageRoleSystem,
-					Content: "You are a helpful assistant that analyzes git diffs and generates concise commit messages.",
-				},
-				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: prompt,
-				},
+			Messages: []openai.ChatCompletionMessageParamUnion{
+				openai.SystemMessage("You are a helpful assistant that analyzes git diffs and generates concise commit messages."),
+				openai.UserMessage(prompt),
 			},
-			ResponseFormat: &openai.ChatCompletionResponseFormat{
-				Type: openai.ChatCompletionResponseFormatTypeJSONSchema,
-				JSONSchema: &openai.ChatCompletionResponseFormatJSONSchema{
-					Name:   "commit_message_schema",
-					Schema: schema,
-					Strict: true,
+			ResponseFormat: openai.ChatCompletionNewParamsResponseFormatUnion{
+				OfJSONSchema: &openai.ResponseFormatJSONSchemaParam{
+					JSONSchema: openai.ResponseFormatJSONSchemaJSONSchemaParam{
+						Name:   "commit_message_schema",
+						Schema: commitMessageResponseSchema,
+						Strict: openai.Bool(true),
+					},
 				},
 			},
 		},
